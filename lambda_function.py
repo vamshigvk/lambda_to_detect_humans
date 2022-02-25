@@ -22,9 +22,10 @@ def lambda_handler(event, context):
     return {"statusCode": 500, "body": json.dumps("There is an issue!")}
 
 def main(bucketname,filename):
-
+    os.system('chmod -R 777 yolov5/')
     print('before downloading file from S3, filename: ', filename)
     s3.download_file(bucketname, filename, 'yolov5/'+filename)
     os.system("python3 yolov5/detect.py --source yolov5/"+ filename )
     s3.upload_file(destination_bucketname, 'yolov5/runs/detect/exp/'+filename, filename)
     print('end of main')
+
