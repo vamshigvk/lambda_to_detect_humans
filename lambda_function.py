@@ -35,7 +35,7 @@ def main(bucketname,filename):
 
     try:
         print('before triggering detect')
-        os.system("python3 detect.py --source "+filename )
+        os.system("python3 yolov5/detect.py --source "+filename )
         print('after triggering detect')
     except  Exception as e:
         print('exception while running detect: ', str(e))
@@ -43,7 +43,7 @@ def main(bucketname,filename):
 
     try:
         print('before saving output file to S3 ')
-        s3.download_file(destination_bucketname, 'runs/detect/exp/'+filename, filename)
+        s3.download_file(destination_bucketname, 'yolov5/runs/detect/exp/'+filename, filename)
         print('after saving output file to S3')
 
     except  Exception as e:
