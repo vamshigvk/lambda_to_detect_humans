@@ -9,11 +9,10 @@ phases:
     commands:
       - echo Build started on `date`
       - echo Building the Docker image...          
-      - docker build -t yolov5 .
-      - docker tag yolov5:latest 401975321526.dkr.ecr.us-east-1.amazonaws.com/yolov5:latest  
+      - docker build -t stylize_predict .
+      - docker tag stylize_predict:latest 401975321526.dkr.ecr.us-east-1.amazonaws.com/yolov5:stylize_predict 
   post_build:
     commands:
       - echo Build completed on `date`
       - echo Pushing the Docker image...
-      - docker push 401975321526.dkr.ecr.us-east-1.amazonaws.com/yolov5:latest
-      
+      - docker push 401975321526.dkr.ecr.us-east-1.amazonaws.com/yolov5:stylize_predict
