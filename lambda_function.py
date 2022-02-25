@@ -22,31 +22,9 @@ def lambda_handler(event, context):
     return {"statusCode": 500, "body": json.dumps("There is an issue!")}
 
 def main(bucketname,filename):
-    
-    print('start of main')
 
-    try:
-        print('before downloading file from S3, filename: ', filename)
-        s3.download_file(bucketname, filename, filename)
-        print('After downloading file from S3 ')
-    except  Exception as e:
-        print('image downloading failed from S3: ', str(e))
-
-
-    try:
-        print('before triggering detect')
-        os.system("python3 yolov5/detect.py --source "+filename )
-        print('after triggering detect')
-    except  Exception as e:
-        print('exception while running detect: ', str(e))
-
-
-    try:
-        print('before saving output file to S3 ')
-        s3.download_file(destination_bucketname, 'yolov5/runs/detect/exp/'+filename, filename)
-        print('after saving output file to S3')
-
-    except  Exception as e:
-        print('exception while downloading output image to S3: ', str(e))
-
+    print('before downloading file from S3, filename: ', filename)
+    s3.download_file(bucketname, filename, filename)
+    os.system("python3 yolov5/detect.py --source "+filename )
+    s3.download_file(destination_bucketname, 'yolov5/runs/detect/exp/'+filename, filename)
     print('end of main')
