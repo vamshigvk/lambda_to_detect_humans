@@ -24,7 +24,7 @@ def lambda_handler(event, context):
 def main(bucketname,filename):
 
     print('before downloading file from S3, filename: ', filename)
-    s3.download_file(bucketname, filename, filename)
-    os.system("python3 yolov5/detect.py --source "+filename )
-    s3.download_file(destination_bucketname, 'yolov5/runs/detect/exp/'+filename, filename)
+    s3.download_file(bucketname, filename, 'yolov5/'+filename)
+    os.system("python3 yolov5/detect.py --source yolov5/"+ filename )
+    s3.upload_file(destination_bucketname, 'yolov5/runs/detect/exp/'+filename, filename)
     print('end of main')
