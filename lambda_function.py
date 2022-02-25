@@ -29,16 +29,16 @@ def main(bucketname,filename):
         print('before downloading file from S3, filename: ', filename)
         s3.download_file(bucketname, filename, filename)
         print('After downloading file from S3 ')
-    except:
-        print('image downloading failed from S3')
+    except  Exception as e:
+        print('image downloading failed from S3: ', str(e))
 
 
     try:
         print('before triggering detect')
         os.system("python3 detect.py --source "+filename )
         print('after triggering detect')
-    except:
-        print('exception while running detect')
+    except  Exception as e:
+        print('exception while running detect: ', str(e))
 
 
     try:
@@ -46,7 +46,7 @@ def main(bucketname,filename):
         s3.download_file(destination_bucketname, 'runs/detect/exp/'+filename, filename)
         print('after saving output file to S3')
 
-    except:
-        print('image downloading failed from S3')
+    except  Exception as e:
+        print('exception while downloading output image to S3: ', str(e))
 
     print('end of main')
