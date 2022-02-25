@@ -1,5 +1,8 @@
 import os
 import json
+import boto3
+
+s3 = boto3.client('s3')
 
 def lambda_handler(event, context):
     if event:
@@ -11,12 +14,16 @@ def lambda_handler(event, context):
         
         return {
             "statusCode": 200,
-            "body": json.dumps("Document processed successfully!"),
+            "body": json.dumps("Document processed successfully using yolov5!"),
         }
 
     return {"statusCode": 500, "body": json.dumps("There is an issue!")}
 
 def main(bucketname,filename):
     print('before triggering detect, filename: ', filename)
+    try:
+        s3.download_file(bucketname, filename, filename)
+    except:
+        print('image downloading failed from S3')
     os.system("python3 detect.py -source "+ filename )
     print('after triggering detect')

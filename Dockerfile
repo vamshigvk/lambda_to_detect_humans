@@ -1,5 +1,5 @@
 FROM public.ecr.aws/lambda/python:3.6
-RUN yum update -y
+RUN yum update -y && yum install git
 
 COPY . ${LAMBDA_TASK_ROOT}/
 
