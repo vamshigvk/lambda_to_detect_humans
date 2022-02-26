@@ -29,11 +29,11 @@ def lambda_handler(event, context):
     print('contents in current directory:', files)
 
     print('before calling detect python file')
-    os.system("python3 detect.py --source /tmp/"+ filename )
+    os.system("python3 detect.py --project /tmp/ --source /tmp/"+ filename )
 
     print('before uploading output file to destination S3 bucket')
-    s3.upload_file('runs/detect/exp/'+filename, destination_bucketname, 'output_'+filename)
-    print('end of main') 
+    s3.upload_file('/tmp/exp/'+filename, destination_bucketname, 'output_'+filename)
+    print('end of main')
 
     return {
         "statusCode": 200,
