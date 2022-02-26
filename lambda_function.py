@@ -32,7 +32,12 @@ def lambda_handler(event, context):
     os.system("python3 detect.py --project /tmp/ --source /tmp/"+ filename )
 
     print('before uploading output file to destination S3 bucket')
-    s3.upload_file('/tmp/exp/'+filename, destination_bucketname, 'output_'+filename)
+    
+    try:
+        s3.upload_file('/tmp/exp/'+filename, destination_bucketname, 'output_'+filename)
+    except:
+        s3.upload_file('/tmp/exp2/'+filename, destination_bucketname, 'output_'+filename)
+    
     print('end of main')
 
     return {
