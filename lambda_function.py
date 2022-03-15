@@ -43,9 +43,9 @@ def lambda_handler(event, context):
     print('before uploading output file to destination S3 bucket')
     
     try:
-        s3.upload_file('/tmp/exp/'+filename, destination_bucketname, path+'/output_'+filename)
+        s3.upload_file('/tmp/exp/'+filename, destination_bucketname, path+'output_'+filename)
     except:
-        s3.upload_file('/tmp/exp2/'+filename, destination_bucketname, path+'/output_'+filename)
+        s3.upload_file('/tmp/exp2/'+filename, destination_bucketname, path+'output_'+filename)
     
     print('end of yolo processing and uploading output image to s3 bucket')
 
