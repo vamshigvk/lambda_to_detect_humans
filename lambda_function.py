@@ -31,7 +31,10 @@ def lambda_handler(event, context):
     print('Key we are downloading is: ',filename)
     
     print('before downloading file from S3, filename: at /tmp/', filename)
-    bucket.download_file(file_key_name, "/tmp/" + filename)
+    try:
+        bucket.download_file(file_key_name, "/tmp/" + filename)
+    except Exception as e:
+        print('failed to download file from S3, exception occurred: ',e)
 
     print('inside this directory: ',os.getcwd())
     files = [f for f in os.listdir('.') if os.path.isfile(f)]
@@ -43,9 +46,10 @@ def lambda_handler(event, context):
     print('before uploading output file to destination S3 bucket')
     
     try:
-        s3.upload_file('/tmp/exp/'+filename, destination_bucketname, path+'output_'+filename)
+        s3.upload_file('/tmp/exp/'+filename, destination_bucketname, path+'/output_'+filename)
     except:
-        s3.upload_file('/tmp/exp2/'+filename, destination_bucketname, path+'output_'+filename)
+        print('inside exp 2 ')
+        s3.upload_file('/tmp/exp2/'+filename, destination_bucketname, path+'/output_'+filename)
     
     print('end of yolo processing and uploading output image to s3 bucket')
 
@@ -67,21 +71,52 @@ def lambda_handler(event, context):
 
 def mail_user(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename):
     print('inside mail_user method')
+    try:
+        with open('/tmp/'+filename, 'rb') as f:
+            img_data = f.read()
 
-    with open('/tmp/'+filename, 'rb') as f:
-        img_data = f.read()
+        msg = MIMEMultipart()
+        msg['Subject'] = "Image from lambda, Client/Cam: " + path + " " + filename
+        msg['From'] = from_mail
+        msg['To'] = to_mail
 
-    msg = MIMEMultipart()
-    msg['Subject'] = "Image from lambda, Client/Cam: " + path + " " + filename
-    msg['From'] = from_mail
-    msg['To'] = to_mail
+        text = MIMEText("Image: ")
+        msg.attach(text)
+        image = MIMEImage(img_data, name=os.path.basename(filename))
+        msg.attach(image)
 
-    text = MIMEText("Image: ")
-    msg.attach(text)
-    image = MIMEImage(img_data, name=os.path.basename(filename))
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
+            smtp.login(smtp_mail, smtp_mail_password)
+            smtp.send_message(msg)
+        print('Done mailing the user')
+    except Exception as e:
+        print('trying from the second emailing method, exception is: ',e)
+        SendMail1(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
+        print('done sending email from sendmail1 method')
+
+def SendMail1(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename):
+    print('inside mail_user method')
+    s = smtplib.SMTP(host='smtp.gmail.com', port=587)
+    s.starttls()
+    s.login(smtp_mail, smtp_mail_password)
+
+    msg = MIMEMultipart()  # create a message
+
+    f = open(filename, 'rb')
+    image = MIMEImage(f.read())
+    # image.add_header('Content-Disposition', "Koeman88")
+    f.close()
     msg.attach(image)
 
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as smtp:
-        smtp.login(smtp_mail, smtp_mail_password)
-        smtp.send_message(msg)
+    # setup the parameters of the message
+
+    msg['From'] = from_mail
+    msg['To'] = to_mail
+    msg['Subject'] = "Image from lambda, Client/Cam: " + path + " " + filename
+
+    # add in the message body
+    msg.attach(MIMEText('test', 'plain'))
+    # send the message via the server set up earlier.
+    s.send_message(msg)
+    s.quit()
     print('Done mailing the user')
