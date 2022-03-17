@@ -43,7 +43,7 @@ def lambda_handler(event, context):
 
     print('before calling detect python file')
     try:
-        os.system("python3 detect.py --project /tmp/ --exist-ok --source /tmp/"+ filename  )
+        os.system("python3 detect.py --project /tmp/ --exist-ok  --save-txt --source /tmp/"+ filename  )
     except Exception as e:
         print('exception occurred in detect python file: ', e)
 
@@ -63,9 +63,15 @@ def lambda_handler(event, context):
     to_mail = os.environ['to_mail']
     smtp_mail_password = os.environ['password']
     
-    print('before calling email function')
-    mail_user(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
-    print('after sending email')
+    with open('/tmp/exp/labels'+filename) as f:
+        lines = f.readlines()
+        print('content of labels files is: ', lines)
+        if len(lines) != 0:    
+            print('before calling email function')
+            mail_user(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
+            print('after sending email')
+        else:
+            print('nothing has been detected, no email is sent')
 
     return {
         "statusCode": 200,
