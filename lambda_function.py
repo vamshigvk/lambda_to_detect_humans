@@ -107,8 +107,10 @@ def SendMail1(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
 
     msg = MIMEMultipart()  # create a message
 
+    file_type = filename.split('.')[-1]
+
     f = open('/tmp/'+filename, 'rb')
-    image = MIMEImage(f.read())
+    image = MIMEImage(f.read(), _subtype=file_type)
     # image.add_header('Content-Disposition', "Koeman88")
     f.close()
     msg.attach(image)
