@@ -98,6 +98,7 @@ def mail_user(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
         SendMail1(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
         print('done sending email from sendmail1 method')
 
+
 def SendMail1(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename):
     print('inside mail_user method')
     s = smtplib.SMTP(host='smtp.gmail.com', port=587)
