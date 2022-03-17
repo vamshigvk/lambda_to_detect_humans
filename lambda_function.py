@@ -28,6 +28,7 @@ def lambda_handler(event, context):
     
     bucket = s3_resource.Bucket(source_bucket_name)
     path, filename = os.path.split(file_key_name)
+    print('path found for S3 is:', path)
     print('Key we are downloading is: ',filename)
     
     print('before downloading file from S3, filename: at /tmp/', filename)
@@ -41,7 +42,10 @@ def lambda_handler(event, context):
     print('contents in current directory:', files)
 
     print('before calling detect python file')
-    os.system("python3 detect.py --project /tmp/ --source /tmp/"+ filename )
+    try:
+        os.system("python3 detect.py --project /tmp/ --exist-ok --source /tmp/"+ filename  )
+    except Exception as e:
+        print('exception occurred in detect python file: ', e)
 
     print('before uploading output file to destination S3 bucket')
     
