@@ -63,7 +63,8 @@ def lambda_handler(event, context):
     to_mail = os.environ['to_mail']
     smtp_mail_password = os.environ['password']
     
-    with open('/tmp/exp/labels'+filename) as f:
+    fname = filename.split('.')[-2]
+    with open('/tmp/exp/labels/'+fname) as f:
         lines = f.readlines()
         print('content of labels files is: ', lines)
         if len(lines) != 0:    
