@@ -57,6 +57,7 @@ def lambda_handler(event, context):
     
     print('end of yolo processing and uploading output image to s3 bucket')
 
+
     
     smtp_mail = os.environ['from_mail']
     from_mail = os.environ['from_mail']
