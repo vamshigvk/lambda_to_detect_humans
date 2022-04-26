@@ -9,6 +9,7 @@ from datetime import date
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from email.mime.multipart import MIMEMultipart
+from pathlib import Path
 
 
 s3 = boto3.client('s3')
@@ -44,20 +45,11 @@ def lambda_handler(event, context):
 
     print('before calling detect python file')
     try:
-        os.system("python3 detect.py --project /tmp/ --exist-ok  --source /tmp/"+ filename + " --save-txt " )
+        os.system("python3 detect.py --project /tmp/ --exist-ok  --source /tmp/"+ filename + " --save-txt  --classes 0" )
     except Exception as e:
         print('exception occurred in detect python file: ', e)
 
-    print('before uploading output file to destination S3 bucket')
     
-    try:
-        s3.upload_file('/tmp/exp/'+filename, destination_bucketname, path+'/output_'+filename)
-    except:
-        print('inside exp 2 ')
-        s3.upload_file('/tmp/exp2/'+filename, destination_bucketname, path+'/output_'+filename)
-    
-    print('end of yolo processing and uploading output image to s3 bucket')
-
 
     
     smtp_mail = os.environ['from_mail']
@@ -67,15 +59,29 @@ def lambda_handler(event, context):
     
     fname = filename.split('.')[-2]
     try:
-        with open('/tmp/exp/labels/'+fname+'.txt') as f:
-            lines = f.readlines()
-            print('content of labels files is: ', lines)
-            if len(lines) != 0:    
-                print('before calling email function')
-                mail_user(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
-                print('after sending email')
-            else:
-                print('nothing has been detected, no email is sent')
+        labelled_file = Path("/tmp/exp/labels/'+fname+'.txt")
+        if labelled_file.exists():
+            print('labelled file exists, detected something, sending email ')
+            
+            with open('/tmp/exp/labels/'+fname+'.txt') as f:
+                lines = f.readlines()
+                print('content of labels files is: ', lines)
+                if len(lines) != 0:    
+                    print('before uploading output file to destination S3 bucket')
+                    
+                    try:
+                        s3.upload_file('/tmp/exp/'+filename, destination_bucketname, path+'/output_'+filename)
+                    except:
+                        print('inside exp 2 ')
+                        s3.upload_file('/tmp/exp2/'+filename, destination_bucketname, path+'/output_'+filename)
+                    
+                    print('end of yolo processing and uploading output image to s3 bucket')
+
+                    print('before calling email function')
+                    mail_user(smtp_mail, from_mail, to_mail, smtp_mail_password, path, filename)
+                    print('after sending email')
+                else:
+                    print('nothing has been detected, no email is sent')
     except Exception as e:
         print('File not found as detection is not happened: ', e)
     return {
